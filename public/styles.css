@@ -1,0 +1,13 @@
+*{
+    margin: 0;
+    padding: 0;
+    background-color: aqua;
+    text-align: center;
+}
+
+.error{
+    color:red;
+    font-size: 0.7rem;
+    /* text-align: right; */
+    margin: left;
+}
