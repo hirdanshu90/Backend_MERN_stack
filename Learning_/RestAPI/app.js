@@ -6,8 +6,10 @@ const bodyParser = require("body-parser")
 // Refering to express as app..
 const app = express();
 
-app.use(bodyParser.urlencoded({extended:false}));
+
+// Using Middleware ... This is to access req.body
 app.use(express.json())
+app.use(bodyParser.urlencoded({extended:false}));
 
 // Connecting to mongo DB
 mongoose.connect("mongodb://127.0.0.1:27017/Sample2", { useNewUrlParser: true, useUnifiedTopology: true })
@@ -32,7 +34,7 @@ const Product = new mongoose.model("Product", productSchema)
 // Creating a Product... POST request
 app.post("/api/v1/product/new", async(req,res)=>{
     const prod = await Product.create(req.body);
-    res.status(200).json({
+    res.status(201).json({
         success:true,
         prod
     })

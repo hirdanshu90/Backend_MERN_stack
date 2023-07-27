@@ -11,10 +11,9 @@ const bcrypt = require("bcrypt");
 const app = express();
 const port = 5000;
 
-
 // Using MIDDLEWARE
 
-// accessing the static path, directly by using the app.use middleware .... 
+// accessing the static path from PUBLIC folder, directly by using the app.use middleware .... 
 app.use(express.static(path.join(path.resolve(), "public")));
 // This middleware is used to access the body of the form ...
 app.use(express.urlencoded({extended: true}))
@@ -58,16 +57,16 @@ const isAuthenticated = async(req,res,next)=>{
 }
 
 
+// Register get request ...
+app.get("/register", (req,res)=>{
+    res.render("register");
+})
+
 // Login get request ....
 app.get("/login", (req,res) =>{
     res.render("login")
 });
 
-
-// Register get request ...
-app.get("/register", (req,res)=>{
-    res.render("register");
-})
 
 // LOGOUT get request ... 
 app.get("/logout", (req,res)=>{
@@ -79,40 +78,17 @@ app.get("/logout", (req,res)=>{
     res.redirect("/")
 })
 
-// Home PAGE get request
+// Home PAGE get request, After successful LOGIN ....
 app.get("/", isAuthenticated,  (req,res)=>{
     res.render("logout", {name:req.user.name})
 
 })
 
-// LOGIN post request ...
-app.post("/login",async (req,res)=>{
-    const {email, password} = req.body;
-
-    let user = await User.findOne(({email}));
-    if(!user){
-        return res.redirect("/register")
-    }
-
-    const isMatch = await (bcrypt.compare(password, user.password));
-
-    if (!isMatch){
-        return res.render("login", {email, message: "Incorrect password"});
-    }
-    // Creating TOKEN
-    const token = jwt.sign({_id: user._id}, "affadfaderff", );
-
-
-    res.cookie("token", token,{
-        httpOnly: true, 
-        expires: new Date(Date.now()+ 60*1000 )
-    });
-    res.redirect("/")
- })
-
 
 // Register the user here ... 
- app.post("/register", async(req,res)=> {
+app.post("/register", async(req,res)=> {
+    
+    // Accessing after destructuring
     const {name, email, password} = req.body;
 
     let user = await User.findOne({email})
@@ -138,6 +114,34 @@ console.log(token);
     });
     res.redirect("/")
  })
+
+// LOGIN post request ...
+app.post("/login",async (req,res)=>{
+    const {email, password} = req.body;
+
+    let user = await User.findOne(({email}));
+    if(!user){
+        return res.redirect("/register")
+    }
+
+    const isMatch =await (bcrypt.compare(password, user.password));
+
+    if (!isMatch){
+        return res.render("login", {email, message: "Incorrect password"});
+    }
+    // Creating TOKEN
+    const token = jwt.sign({_id: user._id}, "affadfaderff", );
+
+
+    res.cookie("token", token,{
+        httpOnly: true, 
+        expires: new Date(Date.now()+ 60*1000 )
+    });
+    res.redirect("/")
+ })
+
+
+
 
 
 // Running the PORT ... 
